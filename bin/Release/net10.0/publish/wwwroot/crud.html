@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Student CRUD</title>
+
+<style>
+/* ===== COLOR PALETTE ===== */
+:root {
+    --crimson: #C2185B;
+    --sand: #F06292;
+    --pearl: #FCE4EC;
+    --black: #AD1457;
+}
+
+/* ===== BODY ===== */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(135deg, var(--black), var(--crimson));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--pearl);
+}
+
+/* ===== MAIN CONTAINER ===== */
+.container {
+    width: 85%;
+    max-width: 950px;
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(15px);
+    padding: 35px;
+    border-radius: 22px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ===== HEADINGS ===== */
+h1 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: var(--pearl);
+    letter-spacing: 1px;
+}
+
+h3 {
+    color: var(--sand);
+    margin-top: 25px;
+}
+
+/* ===== INPUTS ===== */
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    outline: none;
+    background: rgba(255,255,255,0.08);
+    color: var(--pearl);
+    transition: 0.3s;
+}
+
+input:focus {
+    border: 1px solid var(--sand);
+    box-shadow: 0 0 10px rgba(179, 143, 111, 0.3);
+}
+
+/* ===== BUTTONS ===== */
+button {
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: none;
+    background: var(--crimson);
+    color: var(--pearl);
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: 500;
+    margin-right: 8px;
+}
+
+button:hover {
+    background: var(--sand);
+    color: var(--black);
+    transform: translateY(-2px);
+}
+
+/* ===== TABLE ===== */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+th {
+    background: var(--crimson);
+    color: var(--pearl);
+    padding: 14px;
+    letter-spacing: 0.5px;
+}
+
+td {
+    padding: 12px;
+    text-align: center;
+}
+
+/* alternating rows */
+tr:nth-child(even) {
+    background: rgba(255,255,255,0.04);
+}
+
+tr:nth-child(odd) {
+    background: rgba(0,0,0,0.25);
+}
+
+/* hover effect */
+tr:hover {
+    background: rgba(179, 143, 111, 0.15);
+    transition: 0.3s;
+}
+
+/* ===== ACTION BUTTONS ===== */
+td button {
+    background: var(--black);
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 8px;
+}
+
+td button:hover {
+    background: var(--crimson);
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Student Management</h2>
+
+Name:
+<input type="text" id="name">
+
+Course:
+<input type="text" id="course">
+
+<button onclick="addStudent()">Add</button>
+<button onclick="updateStudent()">Update</button>
+
+<h3>Students List</h3>
+
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Course</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="studentTable"></tbody>
+</table>
+
+</div>
+
+<script>
+
+const API = "/api/student"
+let selectedId = null
+
+async function loadStudents(){
+
+let response = await fetch(API)
+let students = await response.json()
+
+let table = document.getElementById("studentTable")
+table.innerHTML = ""
+
+students.forEach(s => {
+
+table.innerHTML += `
+<tr>
+<td>${s.id}</td>
+<td>${s.name}</td>
+<td>${s.course}</td>
+<td>
+<button onclick="editStudent(${s.id}, \`${s.name}\`, \`${s.course}\`)">Edit</button>
+<button onclick="deleteStudent(${s.id})">Delete</button>
+</td>
+</tr>
+`
+})
+
+}
+
+function editStudent(id, name, course){
+document.getElementById("name").value = name
+document.getElementById("course").value = course
+selectedId = id
+}
+
+async function addStudent(){
+
+let student = {
+name: document.getElementById("name").value,
+course: document.getElementById("course").value
+}
+
+await fetch(API, {
+method: "POST",
+headers: {"Content-Type": "application/json"},
+body: JSON.stringify(student)
+})
+
+clearForm()
+loadStudents()
+}
+
+async function updateStudent(){
+
+if(selectedId === null){
+alert("Click Edit first")
+return
+}
+
+let student = {
+id: selectedId,
+name: document.getElementById("name").value,
+course: document.getElementById("course").value
+}
+
+await fetch(API + "/" + selectedId, {
+method: "PUT",
+headers: {"Content-Type": "application/json"},
+body: JSON.stringify(student)
+})
+
+selectedId = null
+clearForm()
+loadStudents()
+}
+
+async function deleteStudent(id){
+await fetch(API + "/" + id, { method: "DELETE" })
+loadStudents()
+}
+
+function clearForm(){
+document.getElementById("name").value = ""
+document.getElementById("course").value = ""
+}
+
+loadStudents()
+
+</script>
+
+</body>
+</html>

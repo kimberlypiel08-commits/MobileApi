@@ -1,22 +1,41 @@
-using MobileApi.Data;
 using Microsoft.EntityFrameworkCore;
+using MobileApi.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services
+builder.Services.AddControllers();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseInMemoryDatabase("PostDb"));
 
-builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
 
-// Middleware
-app.UseHttpsRedirection();
+app.UseCors("AllowAll");
 
-// Map controllers
+// ❌ REMOVE this on Render (safe fix)
+// app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+
+// 🔥 IMPORTANT: Render port binding
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Urls.Add($"http://0.0.0.0:{port}");
+
 app.MapControllers();
 
-// Required for Render deployment
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
-app.Run($"http://0.0.0.0:{port}");
+// Optional test route
+app.MapGet("/", () => "API is running");
+
+app.Run();

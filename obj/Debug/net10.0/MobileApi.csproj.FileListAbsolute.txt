@@ -34,3 +34,6 @@ C:\Users\Administrator\MobileApi\obj\Debug\net10.0\refint\MobileApi.dll
 C:\Users\Administrator\MobileApi\obj\Debug\net10.0\MobileApi.pdb
 C:\Users\Administrator\MobileApi\obj\Debug\net10.0\MobileApi.genruntimeconfig.cache
 C:\Users\Administrator\MobileApi\obj\Debug\net10.0\ref\MobileApi.dll
+C:\Users\Administrator\MobileApi\obj\Debug\net10.0\MobileApi.sourcelink.json
+C:\Users\Administrator\MobileApi\bin\Debug\net10.0\MobileApi.staticwebassets.runtime.json
+C:\Users\Administrator\MobileApi\obj\Debug\net10.0\compressed\3f246b8cin-{0}-cbqqkzb6kr-cbqqkzb6kr.gz
